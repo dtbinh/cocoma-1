@@ -1,0 +1,6 @@
+/bin/
+*.raw
+backup/
+graphs/
+log/
+xmls/
