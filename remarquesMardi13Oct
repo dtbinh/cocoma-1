@@ -1,0 +1,18 @@
+Si une personne possède l'item en quantité suffisante:
+  go si cout ok
+Si plusieurs ont suffisamment :
+  dispatcher et plus près go si cout ok
++ cas où il s'avère plus efficace d'envoyer quelqu'un qui n'a pas l'item que quelqu'un qui l'a.
+si personne n'a l'item ou pas en qt suffisante :
+  ? on élimine ceux qui ne peuvent manipuler l'outil ?
+  on réparti gloutonnt les taches aux agents
+
+-------------
+
+job (item, lieu, prime)
+pour tout job calculer le nb min et max
+cout = argent, distance, temps, charge liberee, delivreeee
+calculer les couts pour chaque combinaison possible d'agents.
+
+Nombre max réduit si nb sous tache < nb agents
+Nb min augmente si aucun agent ne peut réaliser seul la tache (ex drone trop léger)
