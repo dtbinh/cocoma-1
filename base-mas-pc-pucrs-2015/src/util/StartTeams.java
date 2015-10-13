@@ -15,7 +15,7 @@ public class StartTeams {
 				// SimpleDebugStreamAgent.actionconfformat = "conf/team-b/actionconf/%1$s-%2$d";
 				App.main(new String[] { "./conf/team-b/javaagentsconfig.xml" });
 			}
-		}) .start();
+		}).start();
 		
 		System.out.println("Java agents started.");
 

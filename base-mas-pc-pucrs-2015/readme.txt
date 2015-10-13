@@ -9,22 +9,32 @@ It is based on the PUCRS team (see README.md)
 
 Follow the steps below to run it:
 
-- import this folder as a java project in Eclipse
+- import this folder as a java project in Eclipse, (option import existing project)
 
 - in eclipse, open src/util/StartSercer.java and execute it
 
 - open src/util/StartTeams.java and execute
 
+- in the eclipse console, select the StartServer console and press ENTER to start the simulation
+  (in the terminal execution -- see below --, it is easier to press the ENTER in the right place) 
+
 - optionally, open and run src/util/StartMonitor.java
 
-- in the eclipse console, select the StartServer console and press ENTER to start the simulation
+It is also possible to run the simulation using the Ant script (file build.xml), 
+optionally using one terminal for each processes:
+
+- ant server: to start the server
+- ant java-team: to start the java team
+- ant jcm-team
+- ant monitor
 
 ----
 
 Documentation:
 
-- scanario description: doc/scenario.pdf
+- scenario description: doc/scenario.pdf
 - available actions and perception: doc/eismassim.pdf
+- slides: doc/slides-mapc-2015.pdf
 
 To understand the JaCaMo team:
 
@@ -32,4 +42,4 @@ To understand the JaCaMo team:
 
 - vehicle.asl: the main source code for the agents (see comments in the file)
 - common-plans.asl: the main plans (to start deciding a what to do in a step)
-- common-select-goal.asl: select the action for the current situation
+- car.asl, drone.asl, truck.asl and motorcycle.asl: for specific plans for each agent type.

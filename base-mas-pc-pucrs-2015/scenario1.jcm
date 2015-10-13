@@ -2,7 +2,48 @@
  * Base JaCaMo team for MAPC 2015
  * 
  * https://multiagentcontest.org
+ * 
+ * The coordination of this team is hard coded to produce material3.
+ *  
+ * Material 3 requires:
+ *    - 2 material1: drone is responsible
+ *    - 1 base3: truck is responsible
+ *    - 2 base2: motorcycle is responsible
+ *    - tool1: drone
+ *    - tool2: car
+ *    - tool3: motorcycle
+ * 
+ * Overall plans:
+ * 
+ * Vehicle1 (the car): 
+ *    - goes to some shop to buy tool2
+ *    - goes to workshop1
+ *    - wait others
+ *    - assemble material3
+ *    - delivery
+ * 
+ * Vehicle2 (the drone):
+ *    - buys too1
+ *    - buys base1
+ *    - assemble material1
+ *    - buys base1
+ *    - assemble another material1
+ *    - goes to workshop1
+ *    - helps vehicle 1 to assemble material 3 
+ *  
+ * Vehicle3 (the motorcycle):
+ *    - buys too3
+ *    - buys base2
+ *    - goes to workshop1
+ *    - helps vehicle 1 to assemble material 3
+ *  
+ * Vehicle4 (the truck):
+ *    - buys base3
+ *    - goes to workshop1
+ *    - helps vehicle 1 to assemble material 3
+ *  
  */
+ 
 
 mas scenario1 {
 
@@ -19,20 +60,6 @@ mas scenario1 {
 	agent vehicle4: vehicle.asl {
 		goals: register_EIS("connectionA4")
 	}
-	
-	/*
-	// shared artifact version
-
-	agent vehicle: vehicle.asl {
-		//ag-arch: pucrs.agentcontest2015.env.EISAgArch
-		goals: register_freeconn
-		focus: eis
-		instances: 4
-	}
-	workspace city {
-		artifact eis: pucrs.agentcontest2015.env.EISArtifact
-	}
-	*/
 	
 	asl-path: src/pucrs/agentcontest2015/agt
 	

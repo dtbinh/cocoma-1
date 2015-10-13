@@ -9,8 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -18,6 +19,7 @@ import cartago.AgentId;
 import cartago.Artifact;
 import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
+import cartago.ObsProperty;
 import eis.EILoader;
 import eis.EnvironmentInterfaceStandard;
 import eis.exceptions.ActException;
@@ -34,7 +36,7 @@ import eis.iilang.Percept;
 
 public class EISArtifact extends Artifact {
 
-	private Logger logger = Logger.getLogger(EISArtifact.class.getName());
+	private Logger logger = null;
 
 	private EnvironmentInterfaceStandard ei;
 	private Map<String, AgentId> agentIds;
@@ -72,6 +74,7 @@ public class EISArtifact extends Artifact {
 			ei.associateEntity(agent, agent);
 			agentToEntity.put(agent, agent);
 			agentIds.put(agent, getOpUserId());
+			logger = Logger.getLogger(EISArtifact.class.getName());
 			logger.info("Registering: " + agent);
 		} catch (AgentException e) {
 			e.printStackTrace();
@@ -88,6 +91,7 @@ public class EISArtifact extends Artifact {
 			ei.associateEntity(agent, entity);
 			agentToEntity.put(agent, entity);
 			agentIds.put(agent, getOpUserId());
+			logger = Logger.getLogger(EISArtifact.class.getName()+"_"+agent);
 			logger.info("Registering " + agent + " to entity " + entity);
 		} catch (AgentException e) {
 			e.printStackTrace();
@@ -105,6 +109,7 @@ public class EISArtifact extends Artifact {
 			ei.associateEntity(agent, entity);
 			agentToEntity.put(agent, entity);
 			agentIds.put(agent, getOpUserId());
+			logger = Logger.getLogger(EISArtifact.class.getName());
 			logger.info("Registering " + agent + " to entity " + entity);
 		} catch (AgentException e) {
 			e.printStackTrace();
@@ -127,22 +132,124 @@ public class EISArtifact extends Artifact {
 
 	@INTERNAL_OPERATION
 	void receiving() throws JasonException {
+		int lastStep = -1;
+		Collection<Percept> previousPercepts = new ArrayList<Percept>();
+
 		while (receiving) {
-			//for (String agent : ei.getAgents()) {
+			await_time(100);
 			for (String agent: agentIds.keySet()) {
 				try {
 					Collection<Percept> percepts = ei.getAllPercepts(agent).get(agentToEntity.get(agent));
-					for (Percept percept : filter(percepts)) {
-						String name = percept.getName();
-						Literal literal = Translator.perceptToLiteral(percept);
-						signal(agentIds.get(agent), name, (Object[]) literal.getTermsArray());
+					//logger.info("***"+percepts);
+					if (percepts.isEmpty())
+						break;
+					int currentStep = getCurrentStep(percepts);
+					if (lastStep != currentStep) { // only updates if it is a new step
+						lastStep = currentStep;
+						//logger.info("new step "+currentStep);
+						udpatePerception(agent, previousPercepts, percepts);
+						previousPercepts = percepts;
 					}
-				} catch (PerceiveException | NoEnvironmentException | JasonException e) {
+				} catch (PerceiveException | NoEnvironmentException e) {
 					e.printStackTrace();
 				}
 			}
-			signal("stepPerceptionFinished");
-			await_time(100);
+		}
+	}
+	
+	private int getCurrentStep(Collection<Percept> percepts) {
+		for (Percept percept : percepts) {
+			if (percept.getName().equals("step")) {
+				//logger.info(percept+" "+percept.getParameters().getFirst());
+				return new Integer(percept.getParameters().getFirst().toString());
+			}
+		}
+		return -10;
+	}	
+
+	private void udpatePerception(String agent, Collection<Percept> previousPercepts, Collection<Percept> percepts) throws JasonException {
+		
+		// compute removed perception
+		for (Percept old: previousPercepts) {
+			if (step_obs_prop.contains(old.getName())) {
+				if (!percepts.contains(old)) { // not perceived anymore
+					Literal literal = Translator.perceptToLiteral(old);
+					removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
+					//logger.info("removing old perception "+literal);
+				}
+			}
+		}
+		
+		// compute new perception
+		Literal step = null;
+		for (Percept percept: percepts) {
+			if (step_obs_prop.contains(percept.getName())) {
+				if (!previousPercepts.contains(percept)) { // really new perception 
+					Literal literal = Translator.perceptToLiteral(percept);
+					if (percept.getName().equals("step")) {
+						step = literal;
+					} else if (percept.getName().equals("simEnd")) {
+						cleanObsProps(step_obs_prop);
+						cleanObsProps(match_obs_prop);
+						defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
+						break;
+					} else {
+						//logger.info("adding "+literal);
+						defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
+					}
+				}
+			} else if (match_obs_prop.contains(percept.getName())) {
+				Literal literal = Translator.perceptToLiteral(percept);
+				//logger.info("adding "+literal);
+				defineObsProperty(literal.getFunctor(), (Object[]) literal.getTermsArray());				
+			}
+		}
+		
+		/*
+		cleanObsProps(step_obs_prop);
+		Literal step = null;
+		for (Percept percept : percepts) {
+			if (step_obs_prop.contains(percept.getName()) || match_obs_prop.contains(percept.getName())) {
+				Literal literal = Translator.perceptToLiteral(percept);
+				if (literal.getFunctor().equals("step")) {
+					step = literal;
+				} else if (literal.getFunctor().equals("simEnd")) {
+					cleanObsProps(step_obs_prop);
+					cleanObsProps(match_obs_prop);
+					defineObsProperty(literal.getFunctor(), (Object[]) literal.getTermsArray());
+					break;
+				} else {
+					logger.info("adding "+literal);
+					defineObsProperty(literal.getFunctor(), (Object[]) literal.getTermsArray());
+				}
+			}
+		}
+		*/
+		
+		if (step != null) {
+			//logger.info("adding "+step);
+			//signal(agentIds.get(agent), step.getFunctor(), (Object[]) step.getTermsArray());
+			defineObsProperty(step.getFunctor(), (Object[]) step.getTermsArray());
+		}
+
+	}
+
+	private void cleanObsProps(Set<String> obSet) {
+		for (String obs: obSet) {
+			cleanObsProp(obs);
+		}
+	}
+
+	private void cleanObsProp(String obs) {
+		try {
+			ObsProperty ob = getObsProperty(obs);
+			while (ob != null) {
+				//logger.info("Removing "+ob);
+				removeObsProperty(obs);
+				ob = getObsProperty(obs);
+			}
+		} catch (Exception e) {
+			// ignore
 		}
 	}
 
@@ -151,47 +258,43 @@ public class EISArtifact extends Artifact {
 		receiving = false;
 	}
 
-	static List<String> agent_filter = Arrays.asList(new String[]{
-		"charge",
+//	static Set<String> as_signal = new HashSet<String>( Arrays.asList(new String[] {
 //		"entity",
 //		"fPosition",
-		"inFacility",
-		"item",
-		"lastAction",
+//		"lastAction",
 //		"lastActionParam",
-//		"lastActionResult",
+//		
 //		"lat",
-		"load",
 //		"lon",
 //		"requestAction",
-		"role",
-		"step",
 //		"route",
 //		"routeLength",
 //		"team",
 //		"timestamp",		
-
+//		"auctionJob",		
+//	}));
+	
+	static Set<String> match_obs_prop = new HashSet<String>( Arrays.asList(new String[] {
 		"steps",
-		"jobTaken",
-		"simEnd",		
-		"auctionJob",		
-		"pricedJob",
-		"product",		
-		"shop",
+		"product",
+		"role",
+	}));
+	
+	static Set<String> step_obs_prop = new HashSet<String>( Arrays.asList(new String[] {
+		"chargingStation",
+		"shop",			
 		"storage",
 		"workshop",
-		"chargingStation",
 		"dump",
-	});
-	
-	public static List<Percept> filter( Collection<Percept> perceptions ){
-		List<Percept> list = new ArrayList<Percept>();
-		for(Percept perception : perceptions){
-			if(agent_filter.contains(perception.getName())){
-				list.add(perception);
-			}
-		}
-		return list;
-	}
+		"charge",
+		"load",
+		"inFacility",
+		"item",
+		"jobTaken",
+		"step",
+		"simEnd",		
+		"pricedJob",
+		"lastActionResult",
+	}));
 
 }

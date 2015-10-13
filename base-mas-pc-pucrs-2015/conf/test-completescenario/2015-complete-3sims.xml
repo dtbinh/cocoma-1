@@ -23,7 +23,7 @@
 	
 		<simulation id="2015-tournament-sim1of3">
 			<configuration
-					maxNumberOfSteps="200"
+					maxNumberOfSteps="500"
 					map="london"
 					seedcapital="500000"
 					interest="2"
