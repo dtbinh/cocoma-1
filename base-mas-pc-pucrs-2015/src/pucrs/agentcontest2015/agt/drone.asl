@@ -1,9 +1,10 @@
+
 // specific plans for drones
 
 !run.
 
 +!run
-<-  !buy_item(tool1,1);
+/*<-  !buy_item(tool1,1);
     !buy_item(base1,5);
     !goto(workshop1,fac);
     !assemble(material1);
@@ -19,6 +20,6 @@
     !wait_skip( step(AS) );
 	!assist_assemble(a1);
 	
-	!skip_forever;    
+	!skip_forever;   */ 
 .
    

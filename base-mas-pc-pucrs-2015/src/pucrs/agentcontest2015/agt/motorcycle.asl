@@ -3,7 +3,7 @@
 !run.
 
 +!run
-<-  !buy_item(tool3,1);
+/*<-  !buy_item(tool3,1);
 	!buy_item(base2,2);
 
     !goto(workshop1,fac);
@@ -13,5 +13,5 @@
     !wait_skip( step(AS) );
 	!assist_assemble(a1);    
 
-	!skip_forever;    
+	!skip_forever;  */  
 .

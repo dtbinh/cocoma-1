@@ -2,11 +2,11 @@
 
 // specific plans for motorcycles
 
+
 !run.
 
 +!run
-<-  
-    !buy_item(tool2,1);
+    /*!buy_item(tool2,1);
 
     !goto(workshop1,fac);
     !all_at([vehicle2,vehicle3,vehicle4],workshop1);
@@ -22,5 +22,5 @@
     ?step(NS);
     .print("Job delivered!!!!! at step ", NS);
       
-	!skip_forever;    
+	!skip_forever;  */  
 .

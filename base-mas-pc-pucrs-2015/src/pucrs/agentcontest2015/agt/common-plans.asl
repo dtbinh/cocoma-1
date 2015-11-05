@@ -6,6 +6,7 @@
 
 +!new_round
 <-  .print("-------------------- BEGIN OF NEW ROUND ----------------");
+	+start
 	.
 	
 +!end_round
