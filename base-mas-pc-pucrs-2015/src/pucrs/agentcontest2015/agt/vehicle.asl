@@ -2,15 +2,9 @@
 { include("common-plans.asl") }
 { include("actions.asl") }
 
-own(self, "tool1", 1).
-own(self, "tool2", 0).
-own(self, "tool3", 0).
-own(self, "base1", 0).
-own(self, "base2", 0).
-own(self, "base3", 0).
-own(self, "material1", 0).
-own(self, "material2", 0).
-own(self, "material3", 0).
+
+
+
 
 // register this agent into the MAPC server (simulator) using a personal interface artifact
 +!register_EIS(E)
@@ -28,9 +22,14 @@ own(self, "material3", 0).
 	registerFreeconn;
 .
 
+
+
+
+
+
 // plan to react to the signal role/5 (from EISArtifact)
 // it loads the source code for the agent's role in the simulation
-+role(Role, Speed, LoadCap, BatteryCap, Tools): .my_name(Y)
++role(Role, Speed, LoadCap, BatteryCap, Tools): .my_name(Self)
 <-
 	.print("Got role: ", Role);
 	!new_round;
@@ -38,70 +37,120 @@ own(self, "material3", 0).
 	.concat(File, ".asl", FileExt);
 	.include(FileExt);
 	
-	for(.member(T, Tools)) 
+	for(.member(T, Tools))
 	{
-		+use(Y, T);
-		.print("j'ajoute ",T," a ",Y)
+		+add_usability(T)
 	}
 	
+	+init_item(tool1);
+	+init_item(tool2);
+	+init_item(tool3);
+	// etc
 	
-	+compute("tool1")
+	// exemple
+	+ajouter_item(tool1, 1);
+	
+	// Prêt !
+	+ready(Self);
+	.broadcast(tell, ready(Self))
 .
 
-+start
+/* 
++pricedJob(Job, Storage, A, B, C, Item_set)
 <-
-	.print("start")
+	// Prêt !
+	+ready(Self);
+	.broadcast(tell, ready(Self))
+.
+* 
+*/
+
+
+// Quand tout le monde est prêt on lance l'algo
++ready(_) : .findall(Z, ready(Z), L) & .length(L, O)
+<-
+	//.print(Y, " me dit qu'il est ready, nb de reçut :", O);
+	if(O == 4)
+	{
+		.print("LAUCH");
+		+compute(tool1);
+		-ready(_)
+	}
+	
 .
 
-+ajouter_item(Item, X) : own(Y, Item, Q) & Y==self
+// Ajoute X pour un 'item' donné
++ajouter_item(Item, X) : .my_name(Self) & product(Item, A, L)
 <-
-	+own(self, Item, Q+X);
-	-own(self, Item, Q);
+	+add_to_own(product(Item, A, L), X);
+	
 	-ajouter_item(Item, X);
 .
 
-+retirer_item(Item, X) : own(Y, Item, Q) & Y==self
+// Ajoute X à la quantité Q du 'product' donné
++add_to_own(Product, X): .my_name(Self) & own(Self, Product, Q)
 <-
-	+own(self, Item, Q-X);
-	-own(self, Item, Q);
-	-retirer_item(Item, X);
+	-own(Self, Product, Q);
+	+own(Self, Product, Q+X);
+	
+	-add_to_own(Product, X)
 .
 
-+own(Who, Item, X) : 	.findall(Y, own(Y, Item, _), L) & .length(L, O)
++add_usability(Item) : .my_name(Self) & product(Item, A, L)
 <-
-		.print(Y)
+	+use(Self, product(Item, A, L));
+	-add_usability(Item)
 .
 
-+compute(Item)
-<- 
-	if((own(Y, Item, X)) & (X > 0) & .my_name(Y))
++init_item(Item) : .my_name(Self) & product(Item, A, L)
+<-
+	+own(Self, product(Item, A, L), 0);
+	
+	-init_item(Item);
+.
+
+
+
+// On attend que tout le monde ai envoyé ses messages
++own(Who, Item, _) : .findall(Who, own(Who, Item, _), L) & .length(L, O)
+<-
+	if(O == 4)
 	{
-		if(use(Y, Item))
+		.print("JOIN");
+	}
+.
+
++compute(Item) : .my_name(Self) & product(Item, A, L)
+<- 
+	if(own(Self, product(Item, A, L), Q) & (Q > 0))
+	{
+		if(use(Self, product(Item, A, L)))
 		{
 			.print("1, 1");
-			.broadcast(tell, own(Y, Item, X));
-			.broadcast(tell, use(Y, Item));
+			//.broadcast(tell, own(Self, Item, Q));
+			//.broadcast(tell, use(Self, Item));
 		}
 		else
 		{
 			.print("1, 0");
-			.broadcast(tell, own(Y, Item, X));
+			//.broadcast(tell, own(Self, Item, Q));
 		}
 	}
 	else
 	{
-		if(use(Y, Item))
+		if(use(Self, product(Item, A, L)))
 		{
 			.print("0, 1");
-			.broadcast(tell, use(Y, Item));
-			.broadcast(tell, own(Y, Item, X));
+			//.broadcast(tell, use(Self, Item));
+			//.broadcast(tell, own(Self, Item, Q));
 		}
 		else
 		{
 			.print("0, 0");
-			.broadcast(tell, own(Y, Item, X));
+			//.broadcast(tell, own(Self, Item, Q));
 		}
 	}
+	-compute(Item);
 .
 
 
