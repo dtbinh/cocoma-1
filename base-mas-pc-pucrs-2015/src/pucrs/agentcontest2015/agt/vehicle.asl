@@ -2,7 +2,10 @@
 { include("common-plans.asl") }
 { include("actions.asl") }
 
-
+{ include("choix_agent_destination.asl")}
+{ include("synchronized.asl")}
+{ include("main_function.asl")}
+{ include("broadcast.asl")}
 
 
 
@@ -26,10 +29,9 @@
 
 
 
-
 // plan to react to the signal role/5 (from EISArtifact)
 // it loads the source code for the agent's role in the simulation
-+role(Role, Speed, LoadCap, BatteryCap, Tools): .my_name(Self)
++role(Role, Speed, LoadCap, BatteryCap, Tools)
 <-
 	.print("Got role: ", Role);
 	!new_round;
@@ -37,120 +39,54 @@
 	.concat(File, ".asl", FileExt);
 	.include(FileExt);
 	
+	.my_name(Self);
+	.abolish(inFacility(_)[source(_)]);
+    +inFacility(workshop1);
+	
+	
+	+item(material2, 1);
+	
 	for(.member(T, Tools))
 	{
-		+add_usability(T)
+		+use(Self, T);
 	}
-	
-	+init_item(tool1);
-	+init_item(tool2);
-	+init_item(tool3);
-	// etc
-	
-	// exemple
-	+ajouter_item(tool1, 1);
+
 	
 	// Prêt !
-	+ready(Self);
-	.broadcast(tell, ready(Self))
+	+jeton_ready(Self);
+	.broadcast(tell, jeton_ready(Self))
 .
 
-/* 
-+pricedJob(Job, Storage, A, B, C, Item_set)
+
+
+// réaction à la réception d'un priced job
++pricedJobX(Job, Storage, A, B, C, Item_set)
 <-
 	// Prêt !
-	+ready(Self);
-	.broadcast(tell, ready(Self))
-.
-* 
-*/
-
-
-// Quand tout le monde est prêt on lance l'algo
-+ready(_) : .findall(Z, ready(Z), L) & .length(L, O)
-<-
-	//.print(Y, " me dit qu'il est ready, nb de reçut :", O);
-	if(O == 4)
+	.print("JOB !!");
+	!estimerCout(pricedJobX(Job, Storage, A, B, C, Item_set));
+	
+	if(True)
 	{
-		.print("LAUCH");
-		+compute(tool1);
-		-ready(_)
+		for(.member(item(Item, Quantity), Item_set))
+		{
+			!broadcast(Storage, Item, Quantity);
+		}
 	}
 	
 .
 
-// Ajoute X pour un 'item' donné
-+ajouter_item(Item, X) : .my_name(Self) & product(Item, A, L)
++item(Item, Quantity)
 <-
-	+add_to_own(product(Item, A, L), X);
-	
-	-ajouter_item(Item, X);
+	.my_name(Self);
+	+own(Self, Item)
 .
 
-// Ajoute X à la quantité Q du 'product' donné
-+add_to_own(Product, X): .my_name(Self) & own(Self, Product, Q)
+
+
+// Estimation du coût d'un job
++!estimerCout(pricedJobX(Job, Storage, A, B, C, Item_set))
 <-
-	-own(Self, Product, Q);
-	+own(Self, Product, Q+X);
-	
-	-add_to_own(Product, X)
+	+estimationCout(pricedJobX(Job, Storage, A, B, C, Item_set), 10);
 .
-
-+add_usability(Item) : .my_name(Self) & product(Item, A, L)
-<-
-	+use(Self, product(Item, A, L));
-	-add_usability(Item)
-.
-
-+init_item(Item) : .my_name(Self) & product(Item, A, L)
-<-
-	+own(Self, product(Item, A, L), 0);
-	
-	-init_item(Item);
-.
-
-
-
-// On attend que tout le monde ai envoyé ses messages
-+own(Who, Item, _) : .findall(Who, own(Who, Item, _), L) & .length(L, O)
-<-
-	if(O == 4)
-	{
-		.print("JOIN");
-	}
-.
-
-+compute(Item) : .my_name(Self) & product(Item, A, L)
-<- 
-	if(own(Self, product(Item, A, L), Q) & (Q > 0))
-	{
-		if(use(Self, product(Item, A, L)))
-		{
-			.print("1, 1");
-			//.broadcast(tell, own(Self, Item, Q));
-			//.broadcast(tell, use(Self, Item));
-		}
-		else
-		{
-			.print("1, 0");
-			//.broadcast(tell, own(Self, Item, Q));
-		}
-	}
-	else
-	{
-		if(use(Self, product(Item, A, L)))
-		{
-			.print("0, 1");
-			//.broadcast(tell, use(Self, Item));
-			//.broadcast(tell, own(Self, Item, Q));
-		}
-		else
-		{
-			.print("0, 0");
-			//.broadcast(tell, own(Self, Item, Q));
-		}
-	}
-	-compute(Item);
-.
-
 
