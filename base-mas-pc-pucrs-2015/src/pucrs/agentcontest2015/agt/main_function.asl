@@ -1,4 +1,6 @@
 
+
+
 // FONCTION DE CHOIX D'OBJECTIFS
 +!repartirObjet(DestinationId, ObjetCourant, Possesseurs, Crafteurs) :
 	product(ObjetCourant, _, ListCompo)	
@@ -8,15 +10,15 @@
 	//Si un ou plusieurs agents possedent l'objet
 	if(not .empty(Possesseurs))
 	{
-		.print("Quelqu'un possède l'objet : ", ObjetCourant, " -> apporter");
+		//.print("Quelqu'un possède l'objet : ", ObjetCourant, " -> apporter");
 		
 		!choixAgtDestination(Possesseurs, DestinationId);//Lignes 33 - 173
 		
 		if(meilleurAgent(Ag))
 		{
-			.print(Ag, " apporte ", ObjetCourant," à ", DestinationId);
 			if(Ag == Self)
 			{
+				.print(Ag, " apporte ", ObjetCourant," à ", DestinationId);
 				//+!goto(DestinationId)
 				//TODO se charger de crafter/déposer l'objet/attendre du soutien 
 			}
@@ -27,34 +29,56 @@
 	//sinon (personne ne possède l'objet)
 	else
 	{
-		.print("Personne ne possède l'objet : ", ObjetCourant);
+		//.print("Personne ne possède l'objet : ", ObjetCourant);
 		
 		//L'objet ne peut pas etre decompose
 		if(.empty(ListCompo))
 		{
-			.print("l'objet ", ObjetCourant," n'est pas composé ! -> acheter");
-			//TODO encheres pour savoir qui va l'acheter
+			// TMP
+			.all_names(AllAgents);
+	
+			!choixAgtDestination(AllAgents, DestinationId);
+			
+			if(meilleurAgent(Ag))
+			{
+				if(Ag == Self)
+				{
+					.print(Ag, " va acheter ", ObjetCourant, " et l'amène à ", DestinationId);
+				}
+				-meilleurAgent(Ag, Cout);
+			}
 		}
 		else
 		{
-			.print("L'objet ", ObjetCourant," est composé !");
+			//.print("L'objet ", ObjetCourant," est composé !");
 			
 			if(.empty(Crafteurs))
 			{
-				.print("Personne ne peut crafter : ", ObjetCourant, " -> acheter");
+				//.print("Personne ne peut crafter : ", ObjetCourant, " -> acheter");
+				// TMP
+				!choixAgtDestination(ListeAgents, DestinationId);
+				
+				if(meilleurAgent(Ag))
+				{
+					if(Ag == Self)
+					{
+						.print(Ag, " va acheter ", ObjetCourant, " à et l'ammène à", DestinationId);
+					}
+					-meilleurAgent(Ag, Cout);
+				}
 			}
 			else
 			{
-				.print("quelqu'un peut crafter : ", ObjetCourant, " -> décomposer");
+				//.print("quelqu'un peut crafter : ", ObjetCourant, " -> décomposer");
 				
 				//On recupere tous les sous objets et leur quantite necessaire
 				for(.member(consumed(SousObjet, QuantiteSSObjet), ListCompo))
 				{
-					!broadcast(workshopDest, SousObjet, QuantiteSSObjet);
+					!broadcast(DestinationId, SousObjet, QuantiteSSObjet);
 				}
 				for(.member(tools(SousOutil, _), ListCompo))
 				{
-					!broadcast(workshopDest, SousOutil, 1);
+					!broadcast(DestinationId, SousOutil, 1);
 				}
 			
 				/* 

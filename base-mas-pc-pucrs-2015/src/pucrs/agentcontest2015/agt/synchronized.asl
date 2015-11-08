@@ -17,7 +17,7 @@
 	{
 		.print("SYNCHRONIZED, launch job");
 		// Lancer un job
-		.at("now +1 s", {+pricedJobX(jobX, storage1, a, b, c, [item(material2, 1)])});
+		.at("now +1 s", {+pricedJobX(jobX, storage1, a, b, c, [item(material2, 2)])});
 		
 		.abolish(jeton_ready(_, _)[source(_)]);
 	}

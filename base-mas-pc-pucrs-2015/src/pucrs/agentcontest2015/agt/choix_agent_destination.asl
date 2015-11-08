@@ -18,7 +18,7 @@
 	.abolish(cout_agent(_, _)[source(_)]);
 .
 
-//CAS : SHOP
+
 +!enchereAgtDestination(Agent, Src, Destination) :
 	(shop(Src, Lon, Lat, _) | workshop(Src, Lon, Lat, _) | storage(Src, Lon, Lat, _, _, _, _) | dump(Src, Lon, Lat, _) | chargingStation(Src, Lon, Lat, _, _, _)) &
 	storage(Destination, Lon2, Lat2, _, _, _, _) &
