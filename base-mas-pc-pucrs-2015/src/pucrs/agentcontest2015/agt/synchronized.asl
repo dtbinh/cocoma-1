@@ -2,21 +2,24 @@
 // Code
 // 1 : lancer job
 
-+jeton_ready(Who)
++jeton_ready(Who, Where)
 <-	
-	.count(jeton_ready(P), NumberOfReady);
+	.count(jeton_ready(P, W), NumberOfReady);
 	.my_name(Self);
 
 	.all_names(AllAgents);
 	.length(AllAgents, NumberOfAgents);
 	
+	// Connaissance de la position initiale des autres agents
+	+ag_location(Who, Where);
+	
 	if(NumberOfReady == NumberOfAgents)
 	{
 		.print("SYNCHRONIZED, launch job");
 		// Lancer un job
-		+pricedJobX(jobX, storage1, a, b, c, [item(material2, 1)]);
+		.at("now +1 s", {+pricedJobX(jobX, storage1, a, b, c, [item(material2, 1)])});
 		
-		.abolish(jeton_ready(_)[source(_)]);
+		.abolish(jeton_ready(_, _)[source(_)]);
 	}
 		
 .

@@ -6,7 +6,7 @@
 	.member(Agent, ListeAgents) &
 	.my_name(Self)
 <-
-	+meilleurAgent(Agent, 0);
+	+meilleurAgent(Agent);
 .
 	
 +!choixAgtDestination(ListeAgents, Destination) : 
@@ -14,11 +14,17 @@
 <-
 	for(.member(Agent, ListeAgents))
 	{
-		if((ag_loc(Agent, Location) | ((Self == Agent) & inFacility(Location))) & not (Location==none))
+		if(ag_location(Agent, Location) & Location \== none)
 		{
 			!enchereAgtDestination(Agent, Location, Destination);
 		}
 	}
+	
+	.findall(cout_agent(Cout, Agent), cout_agent(Cout, Agent), List);
+	.min(List, cout_agent(CoutBest, AgentBest));
+	
+	+meilleurAgent(AgentBest);
+	.abolish(cout_agent(_, _)[source(_)]);
 .
 
 //CAS : SHOP
@@ -28,21 +34,7 @@
 	role(_, Speed, _, _, _)
 	
 <-
-	+meilleurAgent(Agent, ((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed)
-.
-
-
-+!enchereAgtDestination(Agent, Y, Destination) :
-	shop(Y, Lon, Lat, _) &
-	storage(Destination, Lon2, Lat2, _, _, _, _) &
-	meilleurAgent(Agent2, Y) &
-	role(_, Speed, _, _, _)
-<-
-	if(((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed<Y)
-	{
-		-meilleurAgent(Agent2, Y);
-		+meilleurAgent(Agent, ((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed)
-	}
+	+cout_agent(((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed, Agent);
 .
 
 
@@ -52,49 +44,18 @@
 	storage(Destination, Lon2, Lat2, _, _, _, _)  &
 	role(_, Speed, _, _, _)
 <-
-	+meilleurAgent(Agent, ((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed)
-.
-
-+!enchereAgtDestination(Agent, Y, Destination) :
-	storage(Y, Lon, Lat, _, _, _, _) &
-	storage(Destination, Lon2, Lat2, _) &
-	meilleurAgent(Agent2, Y) &
-	role(_, Speed, _, _, _)
-<-
-	if(((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed<Y)
-	{
-		-meilleurAgent(Agent2, Y);
-		+meilleurAgent(Agent, ((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed)
-	}
+	+cout_agent(((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed, Agent);
 .
 
 //CAS : WORKSHOP
-
-
-+!enchereAgtDestination(Agent, WorkShop, Destination) :
-	workshop(WorkShop, Lon, Lat, _) &
-	storage(Destination, Lon2, Lat2, _, _, _, _) &
-	meilleurAgent(Agent2, BestValue) &
-	role(_, Speed, _, _, _)
-<-
-	
-	if(((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed < BestValue)
-	{
-		.print(Agent, " > ", Agent2);
-		-meilleurAgent(Agent2, BestValue);
-		+meilleurAgent(Agent, ((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed);
-	}
-.
 
 +!enchereAgtDestination(Agent, WorkShop, Destination) :
 	workshop(WorkShop, Lon, Lat, _) &
 	storage(Destination, Lon2, Lat2, _, _, _, _) & 
 	role(_, Speed, _, _, _)
 <-
-	.print("start");
-	+meilleurAgent(Agent, ((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed);
+	+cout_agent(((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed, Agent);
 .
-
 
 
 //CAS : DUMP
@@ -103,22 +64,10 @@
 	storage(Destination, Lon2, Lat2, _, _, _, _)  &
 	role(_, Speed, _, _, _)
 <-
-		+meilleurAgent(Agent, ((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed)
+	+cout_agent(((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed, Agent);
 .
 
 
-+!enchereAgtDestination(Agent, Y, Destination) :
-	dump(Y, Lon, Lat, _) &
-	storage(Destination, Lon2, Lat2, _, _, _, _) &
-	meilleurAgent(Agent2, Y) &
-	role(_, Speed, _, _, _)
-<-
-	if(((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed<Y)
-	{
-		-meilleurAgent(Agent2, Y);
-		+meilleurAgent(Agent, ((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed)
-	}
-.
 
 
 //CAS : CHARGING STATION
@@ -127,20 +76,6 @@
 	storage(Destination, Lon2, Lat2, _, _, _, _)  &
 	role(_, Speed, _, _, _)
 <-
-		+meilleurAgent(Agent, ((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed)
-.
-
-
-+!enchereAgtDestination(Agent, Y, Destination) :
-	chargingStation(Y, Lon, Lat, _, _, _) &
-	storage(Destination, Lon2, Lat2, _, _, _, _) &
-	meilleurAgent(Agent2, Y) &
-	role(_, Speed, _, _, _)
-<-
-	if(((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed<Y)
-	{
-		-meilleurAgent(Agent2, Y);
-		+meilleurAgent(Agent, ((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed)
-	}
+	+cout_agent(((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed, Agent);
 .
 

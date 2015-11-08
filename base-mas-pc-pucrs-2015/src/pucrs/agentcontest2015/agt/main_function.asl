@@ -12,16 +12,15 @@
 		
 		!choixAgtDestination(Possesseurs, DestinationId);//Lignes 33 - 173
 		
-		if(meilleurAgent(Ag, Cout))
+		if(meilleurAgent(Ag))
 		{
-			.print("meilleur agent : ", Ag);
-		
+			.print(Ag, " apporte ", ObjetCourant," à ", DestinationId);
 			if(Ag == Self)
 			{
 				//+!goto(DestinationId)
 				//TODO se charger de crafter/déposer l'objet/attendre du soutien 
 			}
-			//-meilleurAgent(Ag, Cout);
+			-meilleurAgent(Ag, Cout);
 		}
 		
 	}

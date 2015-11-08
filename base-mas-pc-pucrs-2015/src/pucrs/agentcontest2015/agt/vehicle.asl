@@ -31,32 +31,33 @@
 
 // plan to react to the signal role/5 (from EISArtifact)
 // it loads the source code for the agent's role in the simulation
-+role(Role, Speed, LoadCap, BatteryCap, Tools)
++role(Role, Speed, LoadCap, BatteryCap, Tools) : .my_name(Self)
 <-
-	.print("Got role: ", Role);
-	!new_round;
-	.lower_case(Role, File);
-	.concat(File, ".asl", FileExt);
-	.include(FileExt);
-	
-	.my_name(Self);
-	.abolish(inFacility(_)[source(_)]);
-    +inFacility(workshop1);
-	
-	
-	+item(material2, 1);
 	
 	for(.member(T, Tools))
 	{
 		+use(Self, T);
 	}
-
 	
-	// Prêt !
-	+jeton_ready(Self);
-	.broadcast(tell, jeton_ready(Self))
+	.print("Got role: ", Role);
+	!new_round;
+	.lower_case(Role, File);
+	.concat(File, ".asl", FileExt);
+	.include(FileExt);
+
+	// attente du chargement des spécificités du rôle
+	.wait({+is_include});
+	-is_include;
+	
+	// lancement de la synchro
+	!synchro_ready;
 .
 
++!synchro_ready : .my_name(Self) & ag_location(Self, CurrentLocation)
+<-
+	+jeton_ready(Self, CurrentLocation);
+	.broadcast(tell, jeton_ready(Self, CurrentLocation));
+.
 
 
 // réaction à la réception d'un priced job
@@ -75,13 +76,6 @@
 	}
 	
 .
-
-+item(Item, Quantity)
-<-
-	.my_name(Self);
-	+own(Self, Item)
-.
-
 
 
 // Estimation du coût d'un job
