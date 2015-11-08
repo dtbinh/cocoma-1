@@ -2,7 +2,7 @@
 
 
 // FONCTION DE CHOIX D'OBJECTIFS
-+!repartirObjet(DestinationId, ObjetCourant, Possesseurs, Crafteurs) :
++!repartirObjet(DestinationId, ObjetCourant, Quantity_required, Possesseurs, Crafteurs) :
 	product(ObjetCourant, _, ListCompo)	
 <-
 	.my_name(Self);
@@ -18,6 +18,8 @@
 		{
 			if(Ag == Self)
 			{
+				// permet de ne pas dire que je possède une ressource que j'alloue dejà
+				+engagement(ObjetCourant, Quantity_required)
 				.print(Ag, " apporte ", ObjetCourant," à ", DestinationId);
 				//+!goto(DestinationId)
 				//TODO se charger de crafter/déposer l'objet/attendre du soutien 
@@ -62,7 +64,7 @@
 				{
 					if(Ag == Self)
 					{
-						.print(Ag, " va acheter ", ObjetCourant, " à et l'ammène à", DestinationId);
+						.print(Ag, " va acheter ", ObjetCourant, " à et l'amène à", DestinationId);
 					}
 					-meilleurAgent(Ag, Cout);
 				}
@@ -71,48 +73,29 @@
 			{
 				//.print("quelqu'un peut crafter : ", ObjetCourant, " -> décomposer");
 				
-				//On recupere tous les sous objets et leur quantite necessaire
-				for(.member(consumed(SousObjet, QuantiteSSObjet), ListCompo))
+				!choixAgtDestination(Crafteurs, DestinationId);
+				
+				if(meilleurAgent(Ag))
 				{
-					!broadcast(DestinationId, SousObjet, QuantiteSSObjet);
-				}
-				for(.member(tools(SousOutil, _), ListCompo))
-				{
-					!broadcast(DestinationId, SousOutil, 1);
-				}
-			
-				/* 
-				//Si l'agent est le meilleur crafteur, il part attendre dans le workshop
-				//TODO agent craftant i le plus près de dst
-				if(argmax(Possesseurs) == Self)
-				{
-					//TODO destination la plus rentable
-					if(WorkshopDest == bestDestination)
+					if(Ag == Self)
 					{
-						!goto(WorkshopDest);
-						!assemble(ObjetCourant);
-						
-						//Pour qu'un autre agent lui amène les pièces
-						+broadcast(WorkshopDest, X, QuantiteSSObjet)
-						
+						.print(Ag, " va crafter ", ObjetCourant, " à et l'amène à ", DestinationId);
 					}
-				}			
-				else
-				{
-					//On teste pour chaque sous objet 
-					for(sousObjet(SousObjet, QuantiteSSObjet))
+					
+					//On recupere tous les sous objets et leur quantite necessaire
+					for(.member(consumed(SousObjet, QuantiteSSObjet), ListCompo))
 					{
-						+broadcast(WorkshopDest, SousObjet, QuantiteSSObjet)
-			
-						//On retire l'objet de la liste des sous objets
-						-sousObjet(SousObjet, QuantiteSSObjet);
+						!broadcast(DestinationId, SousObjet, QuantiteSSObjet);
 					}
+					for(.member(tools(SousOutil, _), ListCompo))
+					{
+						!broadcast(DestinationId, SousOutil, 1);
+					}
+				
+					-meilleurAgent(Ag, Cout);
 				}
-				*/
 			}
-			
 		}
-		
 	}
 .
 

@@ -26,10 +26,10 @@
 
 
 // Compteur de reception de messages
-+jeton_receive(_, Place, Item) 		
++jeton_receive(_, Place, Item, Quantity_required) 		
 <-
 	.my_name(Self);
-	.count(jeton_receive(_, _, Item), NumberOfReceive);
+	.count(jeton_receive(_, _, Item, _), NumberOfReceive);
 	
 	.all_names(AllAgents);
 	.length(AllAgents, NumberOfAgents);
@@ -42,9 +42,9 @@
 		.findall(S1, own(S1, Item), List_owner);
  		.findall(S2, craft(S2, Item), List_crafter);
  	
-		.at("now +1 s", {+!repartirObjet(Place, Item, List_owner, List_crafter)});
+		.at("now +1 s", {+!repartirObjet(Place, Item, Quantity_required, List_owner, List_crafter)});
 		
-		.abolish(jeton_receive(_, _, Item)[source(_)]);
+		.abolish(jeton_receive(_, _, Item, _)[source(_)]);
 		.abolish(own(_, Item)[source(_)]);
 		.abolish(craft(_, Item)[source(_)]);
 	}
