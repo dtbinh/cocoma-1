@@ -19,9 +19,9 @@
 .
 
 
-+!enchereAgtDestination(Agent, Src, Destination) :
-	(shop(Src, Lon, Lat, _) | workshop(Src, Lon, Lat, _) | storage(Src, Lon, Lat, _, _, _, _) | dump(Src, Lon, Lat, _) | chargingStation(Src, Lon, Lat, _, _, _)) &
-	storage(Destination, Lon2, Lat2, _, _, _, _) &
++!enchereAgtDestination(Agent, Source, Destination) :
+	(shop(Source, Lon, Lat, _) | workshop(Source, Lon, Lat, _) | storage(Source, Lon, Lat, _, _, _, _) | dump(Source, Lon, Lat, _) | chargingStation(Source, Lon, Lat, _, _, _)) &
+	(shop(Destination, Lon2, Lat2, _) | workshop(Destination, Lon2, Lat2, _) | storage(Destination, Lon2, Lat2, _, _, _, _) | dump(Destination, Lon2, Lat2, _) | chargingStation(Destination, Lon2, Lat2, _, _, _)) &
 	role(_, Speed, _, _, _)
 	
 <-
