@@ -13,7 +13,7 @@
 	// Connaissance de la position initiale des autres agents
 	+ag_location(Who, Where);
 	
-	if(NumberOfReady == NumberOfAgents)
+	if(NumberOfReady >= NumberOfAgents)
 	{
 		.print("SYNCHRONIZED, launch job");
 		// Lancer un job
@@ -29,14 +29,13 @@
 +jeton_receive(_, Place, Item) 		
 <-
 	.my_name(Self);
-	
 	.count(jeton_receive(_, _, Item), NumberOfReceive);
 	
 	.all_names(AllAgents);
 	.length(AllAgents, NumberOfAgents);
 	
 	// quand j'ai reçus les messages de tout le monde
-	if(NumberOfReceive == NumberOfAgents)
+	if(NumberOfReceive >= NumberOfAgents)
 	{
 		.print("SYNCHRONIZED, launch algorithm");
 		
