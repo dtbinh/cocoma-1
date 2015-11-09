@@ -1,12 +1,52 @@
 
 
+	for(.member(jetonOccupation(_, D), Nb))
+	{
+		if((D == shop1) | (D==shop2))
+			{
+				.print("J'achete ", Objet);
+				!goto(D, Fac);
+				!buy_item(Objet,Quantite);
+			}
+		else
+		{
+			if((D == workshop1) | (D == workshop2))
+			{
+				.print("Je crafte ", Objet);
+				!goto(D, Fac);
+				!assemble(Objet);
+			}
+			else
+			{
+				
+				if(D == Storage)
+				{
+					.print("Je livre ", Objet);
+					!goto(D, Fac);
+    				!deliver_job(Job);
+				}
+				else 
+				{			
+					if(ag_loc(AgentAssist, D))
+					{
+						.print("J'assiste");
+						!goto(D, Fac);
+						!assist_assemble(AgentAssist);
+					}
+				}
+			}
+			
+		}
+	}
+.
 
 // FONCTION DE CHOIX D'OBJECTIFS
 +!repartirObjet(DestinationId, ObjetCourant, Quantity_required, Possesseurs, Crafteurs) :
-	product(ObjetCourant, _, ListCompo)	& engagement(ObjetCourant, Quantite_engagee)
+	product(ObjetCourant, _, ListCompo)	& engagement(ObjetCourant, Quantite_engagee) &
+	.my_name(Self) &
+	ag_location(Self, EndroitActuel)
 <-
-	.my_name(Self);
-	
+	.print("Localisation : ", EndroitActuel );
 	//Si un ou plusieurs agents possedent l'objet
 	if(not .empty(Possesseurs))
 	{
@@ -22,8 +62,6 @@
 				-engagement(ObjetCourant, _);
 				+engagement(ObjetCourant, Quantity_required + Quantite_engagee);
 				.print(Ag, " apporte ", ObjetCourant," à ", DestinationId);
-				//+!goto(DestinationId)
-				//TODO se charger de crafter/déposer l'objet/attendre du soutien 
 			}
 			.abolish(meilleurAgent(_));
 		}
@@ -51,6 +89,9 @@
 					+jetonOccupation(Ag, LocationBest);
 					if(Ag == Self)
 					{
+						
+						-engagement(ObjetCourant, _);
+						+engagement(ObjetCourant, Quantite_engagee);
 						.print("Personne ne possède l'objet : ", ObjetCourant);
 						.print(Ag, " va acheter ", ObjetCourant, " à ", LocationBest," et l'amène à ", DestinationId);
 					}
@@ -62,7 +103,6 @@
 		}
 		else
 		{
-			//.print("L'objet ", ObjetCourant," est composé !");
 			
 			if(.empty(Crafteurs))
 			{
@@ -80,6 +120,8 @@
 						+jetonOccupation(Ag, LocationBest);
 						if(Ag == Self)
 						{
+							-engagement(ObjetCourant, _);
+							+engagement(ObjetCourant, Quantite_engagee);
 							.print("Personne ne peut crafter : ", ObjetCourant, " -> acheter");
 							.print(Ag, " va acheter ", ObjetCourant, " à ", LocationBest, " et l'amène à", DestinationId);
 						}
@@ -103,8 +145,10 @@
 						+jetonOccupation(Ag, LocationBest);
 						if(Ag == Self)
 						{
-							.print("quelqu'un peut crafter : ", ObjetCourant, " -> décomposer");
-							.print(Ag, " va crafter ", ObjetCourant, " à ", LocationBest," et l'amène à ", DestinationId);
+							-engagement(ObjetCourant, _);
+							+engagement(ObjetCourant, Quantite_engagee);
+							//.print("quelqu'un peut crafter : ", ObjetCourant, " -> décomposer");
+							//.print(Ag, " va crafter ", ObjetCourant, " à ", LocationBest," et l'amène à ", DestinationId);
 						}
 						
 						//On recupere tous les sous objets et leur quantite necessaire
