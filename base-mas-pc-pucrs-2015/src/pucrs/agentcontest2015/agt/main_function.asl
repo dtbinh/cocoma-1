@@ -10,7 +10,7 @@
 	//Si un ou plusieurs agents possedent l'objet
 	if(not .empty(Possesseurs))
 	{
-		!choixAgent(Possesseurs, DestinationId);//Lignes 33 - 173
+		!choixAgent(Possesseurs, DestinationId, "livraison");//Lignes 33 - 173
 		
 		if(meilleurAgent(Ag))
 		{
@@ -38,7 +38,7 @@
 			// TMP
 			.all_names(AllAgents);
 	
-			!choixAgent(AllAgents, DestinationId);
+			!choixAgent(AllAgents, DestinationId, "achat");
 			
 			if(meilleurAgent(Ag))
 			{
@@ -67,7 +67,7 @@
 			if(.empty(Crafteurs))
 			{
 				// TMP
-				!choixAgent(ListeAgents, DestinationId);
+				!choixAgent(ListeAgents, DestinationId, "achat");
 				
 				if(meilleurAgent(Ag))
 				{
@@ -90,7 +90,7 @@
 			}
 			else
 			{
-				!choixAgent(Crafteurs, DestinationId);
+				!choixAgent(Crafteurs, DestinationId, "craft");
 				
 				if(meilleurAgent(Ag))
 				{
