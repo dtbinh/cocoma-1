@@ -11,8 +11,8 @@
 		}
 	}
 	
-	.findall(cout_agent(Cout, Agent, Key), cout_agent(Cout, Agent, Key), List);
-	.min(List, cout_agent(CoutBest, AgentBest, Key));
+	.findall(cout_agent(O, Cout, Agent, Key), cout_agent(O, Cout, Agent, Key), List);
+	.min(List, cout_agent(OBest, CoutBest, AgentBest, Key));
 	
 	+meilleurAgent(AgentBest);
 	.abolish(cout_agent(_, _, Key)[source(_)]);
@@ -25,7 +25,8 @@
 	role(_, Speed, _, _, _)
 	
 <-
-	+cout_agent(((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed, Agent, Key);
+	.count(jetonOccupation(Agent,_), O);
+	+cout_agent(O, ((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed, Agent, Key);
 .
 
 
