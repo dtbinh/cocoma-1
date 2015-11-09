@@ -34,6 +34,7 @@
 	{
 		+use(Self, T);
 	}
+
 	
 	.print("Got role: ", Role);
 	!new_round;

@@ -28,13 +28,13 @@
 	
 	if(N == NumberOfAgents)
 	{
-		.print("STOP");
-		+pricedJobX(job, storage1, a, b, c, [item(material2, 1)]);
+		//.print("STOP");
+		+pricedJobX(job, storage1, a, b, c, [item(material3, 1)]);
 	}
 	else
 	{
-		.print("TOUR");
-		+pricedJobX(job, storage1, a, b, c, [item(material2, 1)]);
+		//.print("TOUR");
+		+pricedJobX(job, storage1, a, b, c, [item(material3, 1)]);
 		//!sendToNextAgent(Expediteur, Location);
 	}
 	.abolish(jetonReady(_, _))
@@ -92,17 +92,17 @@
 +jetonReceive(Expediteur, Item) : .my_name(Self) & Expediteur == Self & tmp(Place, Item, Quantity_required)
 <-
 	// quand j'ai reçus les messages de tout le monde
-	
-	.print("SYNCHRONIZED, ", Item);
+	//.print("SYNCHRONIZED, ", Item);
 	
 	.findall(S1, own(S1, Item), List_owner);
 	.findall(S2, craft(S2, Item), List_crafter);
 
-	.at("now +2 s", {+!repartirObjet(Place, Item, Quantity_required, List_owner, List_crafter)});
-
 	.abolish(jetonReceive(_, Item)[source(_)]);
 	.abolish(own(_, Item)[source(_)]);
 	.abolish(craft(_, Item)[source(_)]);
+	
+	.at("now +2 s", {+!repartirObjet(Place, Item, Quantity_required, List_owner, List_crafter)});
+
 	-tmp(_, Item, _);
 	
 .
