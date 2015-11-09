@@ -45,11 +45,11 @@
 		}
 	}
 	
-	.findall(cout_destination(Cout, Location, Key), cout_destination(Cout, Location, Key), List);
-	.min(List, cout_destination(CoutBest, LocationBest, Key));
+	.findall(cout_destination(O, Cout, Location, Key), cout_destination(O, Cout, Location, Key), List);
+	.min(List, cout_destination(OBest, CoutBest, LocationBest, Key));
 	
 	+meilleurDestination(LocationBest);
-	//.abolish(cout_destination(Agent, _, _)[source(_)]);
+	.abolish(cout_destination(_, _, Key)[source(_)]);
 .
 
 
@@ -61,5 +61,6 @@
 	role(_, Speed, _, _, _)
 	
 <-
-	+cout_destination(((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed, Destination, Key);
+	.count(jetonOccupation(_, Destination), O);
+	+cout_destination(O, ((Lon2-Lon) * (Lon2-Lon) + (Lat2-Lat) * (Lat2-Lat))/Speed, Destination, Key);
 .
