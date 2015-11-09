@@ -25,15 +25,11 @@
 	registerFreeconn;
 .
 
-
-
-
-
 // plan to react to the signal role/5 (from EISArtifact)
 // it loads the source code for the agent's role in the simulation
 +role(Role, Speed, LoadCap, BatteryCap, Tools) : .my_name(Self)
 <-
-	
+      
 	for(.member(T, Tools))
 	{
 		+use(Self, T);
@@ -49,16 +45,8 @@
 	.wait({+is_include});
 	-is_include;
 	
-	// lancement de la synchro
-	!synchro_ready;
+    !synchroReady;
 .
-
-+!synchro_ready : .my_name(Self) & ag_location(Self, CurrentLocation)
-<-
-	+jeton_ready(Self, CurrentLocation);
-	.broadcast(tell, jeton_ready(Self, CurrentLocation));
-.
-
 
 // réaction à la réception d'un priced job
 +pricedJobX(Job, Storage, A, B, C, Item_set)
@@ -71,6 +59,7 @@
 	{
 		for(.member(item(Item, Quantity), Item_set))
 		{
+			+engagement(Item, 0)
 			!broadcast(Storage, Item, Quantity);
 		}
 	}
