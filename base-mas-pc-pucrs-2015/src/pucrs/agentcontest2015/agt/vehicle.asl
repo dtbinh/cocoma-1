@@ -60,7 +60,7 @@
 	{
 		for(.member(item(Item, Quantity), Item_set))
 		{
-			+engagement(Item, 0)
+			+engagement(Item, 0);
 			!broadcast(Storage, Item, Quantity);
 		}
 	}

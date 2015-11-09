@@ -3,7 +3,7 @@
 	engagement(Objet, Quantite) &
 	.my_name(Agent) &
 	.findall(jetonOccupation(Agent, Destination), jetonOccupation(Agent, Destination), Nb) &
-	pricedJobX(Job, Storage, _, _, _, _)
+	pricedJob(Job, Storage, _, _, _, _)
 <-
 
 	for(.member(jetonOccupation(_, D), Nb))
@@ -13,6 +13,7 @@
 				.print("J'achete ", Objet);
 				!goto(D, Fac);
 				!buy_item(Objet,Quantite);
+				.print("achete");
 			}
 		else
 		{
@@ -29,11 +30,12 @@
 				{
 					.print("Je livre ", Objet);
 					!goto(D, Fac);
+					.print("gfdgjfdl");
     				!deliver_job(Job);
 				}
 				else 
 				{			
-					if(ag_loc(AgentAssist, D))
+					if(ag_location(AgentAssist, D))
 					{
 						.print("J'assiste");
 						!goto(D, Fac);
