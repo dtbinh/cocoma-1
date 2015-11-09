@@ -1,4 +1,10 @@
 
++engagement(Objet, Quantite) :
+	engagement(Objet, Quantite) &
+	.my_name(Agent) &
+	.findall(jetonOccupation(Agent, Destination), jetonOccupation(Agent, Destination), Nb) &
+	pricedJobX(Job, Storage, _, _, _, _)
+<-
 
 	for(.member(jetonOccupation(_, D), Nb))
 	{
