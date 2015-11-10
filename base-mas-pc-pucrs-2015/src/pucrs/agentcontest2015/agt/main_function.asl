@@ -1,4 +1,5 @@
 
+/*
 +engagement(Objet, Quantite) :
 	engagement(Objet, Quantite) &
 	.my_name(Agent) &
@@ -30,6 +31,7 @@
 				{
 					.print("Je livre ", Objet);
 					!goto(D, Fac);
+					
 					.print("gfdgjfdl");
     				!deliver_job(Job);
 				}
@@ -47,14 +49,14 @@
 		}
 	}
 .
-
+*/
 // FONCTION DE CHOIX D'OBJECTIFS
 +!repartirObjet(DestinationId, ObjetCourant, Quantity_required, Possesseurs, Crafteurs) :
 	product(ObjetCourant, _, ListCompo)	& engagement(ObjetCourant, Quantite_engagee) &
 	.my_name(Self) &
 	ag_location(Self, EndroitActuel)
 <-
-	.print("Localisation : ", EndroitActuel );
+	//.print("Localisation : ", EndroitActuel );
 	//Si un ou plusieurs agents possedent l'objet
 	if(not .empty(Possesseurs))
 	{
@@ -69,7 +71,7 @@
 				// permet de ne pas dire que je possède une ressource que j'alloue dejà
 				-engagement(ObjetCourant, _);
 				+engagement(ObjetCourant, Quantity_required + Quantite_engagee);
-				.print(Ag, " apporte ", ObjetCourant," à ", DestinationId);
+				.print("j'apporte ", ObjetCourant," à ", DestinationId);
 			}
 			.abolish(meilleurAgent(_));
 		}
@@ -101,7 +103,7 @@
 						-engagement(ObjetCourant, _);
 						+engagement(ObjetCourant, Quantite_engagee);
 						.print("Personne ne possède l'objet : ", ObjetCourant);
-						.print(Ag, " va acheter ", ObjetCourant, " à ", LocationBest," et l'amène à ", DestinationId);
+						.print("je vais acheter ", ObjetCourant, " à ", LocationBest," et l'amène à ", DestinationId);
 					}
 					.abolish(meilleurDestination(_));
 				}
@@ -131,7 +133,7 @@
 							-engagement(ObjetCourant, _);
 							+engagement(ObjetCourant, Quantite_engagee);
 							.print("Personne ne peut crafter : ", ObjetCourant, " -> acheter");
-							.print(Ag, " va acheter ", ObjetCourant, " à ", LocationBest, " et l'amène à", DestinationId);
+							.print("Je vais acheter ", ObjetCourant, " à ", LocationBest, " et l'amène à", DestinationId);
 						}
 						.abolish(meilleurDestination(_));
 					}
@@ -155,8 +157,8 @@
 						{
 							-engagement(ObjetCourant, _);
 							+engagement(ObjetCourant, Quantite_engagee);
-							//.print("quelqu'un peut crafter : ", ObjetCourant, " -> décomposer");
-							//.print(Ag, " va crafter ", ObjetCourant, " à ", LocationBest," et l'amène à ", DestinationId);
+							.print("quelqu'un peut crafter : ", ObjetCourant, " -> décomposer");
+							.print("je vais crafter ", ObjetCourant, " à ", LocationBest," et l'amène à ", DestinationId);
 						}
 						
 						//On recupere tous les sous objets et leur quantite necessaire
