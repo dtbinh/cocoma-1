@@ -1,5 +1,5 @@
 
-/*
+
 +engagement(Objet, Quantite) :
 	engagement(Objet, Quantite) &
 	.my_name(Agent) &
@@ -49,7 +49,7 @@
 		}
 	}
 .
-*/
+
 // FONCTION DE CHOIX D'OBJECTIFS
 +!repartirObjet(DestinationId, ObjetCourant, Quantity_required, Possesseurs, Crafteurs) :
 	product(ObjetCourant, _, ListCompo)	& engagement(ObjetCourant, Quantite_engagee) &
